@@ -1,0 +1,613 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.0  (Unix)">
+	<META NAME="AUTHOR" CONTENT="talend">
+	<META NAME="CREATED" CONTENT="20090316;14090000">
+	<META NAME="CHANGEDBY" CONTENT="Damien Seguy">
+	<META NAME="CHANGED" CONTENT="20090429;14183900">
+	<STYLE TYPE="text/css">
+	<!--
+		@page { margin: 2.5cm }
+		P { margin-bottom: 0.21cm; direction: ltr; color: #000000; widows: 2; orphans: 2 }
+		H1 { margin-top: 0.85cm; margin-bottom: 0cm; direction: ltr; color: #365f91; widows: 2; orphans: 2 }
+		H1.western { font-family: "Cambria", serif; font-size: 14pt }
+		H1.cjk { font-family: "Arial Unicode MS"; font-size: 14pt }
+		H1.ctl { font-family: "Tahoma"; font-size: 14pt }
+		H2 { margin-top: 0.35cm; margin-bottom: 0cm; direction: ltr; color: #4f81bd; widows: 2; orphans: 2 }
+		H2.western { font-family: "Cambria", serif; font-size: 13pt }
+		H2.cjk { font-family: "Arial Unicode MS"; font-size: 13pt }
+		H2.ctl { font-family: "Tahoma"; font-size: 13pt }
+		H3 { margin-top: 0.35cm; margin-bottom: 0cm; direction: ltr; color: #4f81bd; widows: 2; orphans: 2 }
+		H3.western { font-family: "Cambria", serif; font-size: 11pt }
+		H3.cjk { font-family: "Arial Unicode MS"; font-size: 11pt }
+		H3.ctl { font-family: "Tahoma"; font-size: 11pt }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="fr-FR" TEXT="#000000" DIR="LTR">
+<H1 CLASS="western">Bibliothèque&nbsp;: lib4D_SQL</H1>
+<P STYLE="margin-bottom: 0.35cm"><BR><BR>
+</P>
+<P STYLE="margin-bottom: 0.35cm">Cette documentation est publiée
+sous licence CREATIVE COMMONS, dont les termes sont présentés à
+cette adresse&nbsp;:
+http://creativecommons.org/licenses/by/3.0/legalcode</P>
+<H2 CLASS="western">Généralité</H2>
+<P STYLE="margin-bottom: 0.35cm">La bibliothèque lib4D_SQL est créée
+dans l’optique d’être utilisée avec le pilote PDO_4D. 
+</P>
+<P STYLE="margin-bottom: 0.35cm">Elle implémente les bases de la
+communication avec le serveur 4D.  
+</P>
+<P STYLE="margin-bottom: 0.35cm">De manière générale, les
+structures (FOURD, FOURD_STATEMENT, FOURD_RESULT) n’ont pas
+vocation à être lu directement, cela dans le but de pouvoir faire
+évoluer leurs contenus dans avoir à faire évoluer les
+applications/pilote qui utilisent cette bibliothèque.</P>
+<P STYLE="margin-bottom: 0.35cm">La communication s’effectue en
+LATIN1 pour les requêtes, mais les chaines de caractères sont
+retournées et envoyées en UTF-16. Ce point n’est pas traité dans
+la bibliothèque lib4D_SQL. C’est donc un point à traité dans le
+client ou le pilote qui utilisent cette bibliothèque. 
+</P>
+<H2 CLASS="western">Les types de données propres à lib4D_SQL</H2>
+<H3 CLASS="western">Les structures</H3>
+<P STYLE="margin-bottom: 0.35cm"><B>FOURD&nbsp;:</B> contient les
+paramètres de connexion, le socket et les messages d’erreur. 
+</P>
+<P STYLE="margin-bottom: 0.35cm"><B>FOURD_RESULT&nbsp;:</B> contient
+les métadonnées ainsi que le résultat d’une requête (ou une
+partie dans le cas d’un résultat de plusieurs centaines de lignes)</P>
+<P STYLE="margin-bottom: 0.35cm"><B>FOURD_STATEMENT&nbsp;:</B>
+contient la requête ainsi que les paramètres à transmettre avec la
+requête. Cette structure est retournée lors de l’utilisation de
+requête préparée. <FONT COLOR="#ff0000">Attention cela ne
+correspond pas à la commande PREPARE-STATEMENT du protocole de
+communication.</FONT> 
+</P>
+<H3 CLASS="western">Les types de données propres à la base de
+données</H3>
+<P STYLE="margin-bottom: 0.35cm">Il peut exister des différences de
+type en fonction des différentes plateformes matérielles et
+logiciels dans la représentation des types de données. Or les types
+de données de la base 4D eux ne changent pas. Il est donc nécessaire
+de créer des types spécifiques afin de les utiliser à la place des
+types simples. (int, short, char…)</P>
+<P STYLE="margin-bottom: 0.35cm; page-break-after: avoid">Voici les
+types de donnée disponible&nbsp;:</P>
+<TABLE WIDTH=727 BORDER=0 CELLPADDING=8 CELLSPACING=0>
+	<COL WIDTH=153>
+	<COL WIDTH=542>
+	<TR VALIGN=TOP>
+		<TD WIDTH=153>
+			<P STYLE="page-break-after: avoid">Type fourd</P>
+		</TD>
+		<TD WIDTH=542>
+			<P STYLE="page-break-after: avoid">Définition C</P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=153>
+			<P STYLE="page-break-after: avoid">FOURD_BOOLEAN</P>
+		</TD>
+		<TD WIDTH=542>
+			<P STYLE="page-break-after: avoid"><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>short</FONT></FONT></FONT></P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=153>
+			<P STYLE="page-break-after: avoid">FOURD_BYTE</P>
+		</TD>
+		<TD WIDTH=542>
+			<P STYLE="page-break-after: avoid"><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>short</FONT></FONT></FONT></P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=153>
+			<P STYLE="page-break-after: avoid">FOURD_WORD</P>
+		</TD>
+		<TD WIDTH=542>
+			<P STYLE="page-break-after: avoid"><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>short</FONT></FONT></FONT></P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=153>
+			<P STYLE="page-break-after: avoid">FOURD_LONG</P>
+		</TD>
+		<TD WIDTH=542>
+			<P STYLE="page-break-after: avoid"><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>int</FONT></FONT></FONT></P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=153>
+			<P STYLE="page-break-after: avoid">FOURD_LONG8</P>
+		</TD>
+		<TD WIDTH=542>
+			<P STYLE="page-break-after: avoid"><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>__int64</FONT></FONT></FONT>
+			ou <FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>long</FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2>
+			</FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>long</FONT></FONT></FONT></P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=153>
+			<P STYLE="page-break-after: avoid">FOURD_REAL</P>
+		</TD>
+		<TD WIDTH=542>
+			<P STYLE="page-break-after: avoid"><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>double</FONT></FONT></FONT></P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=153>
+			<P STYLE="page-break-after: avoid">FOURD_FLOAT</P>
+		</TD>
+		<TD WIDTH=542>
+			<P STYLE="page-break-after: avoid"><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">struct</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">{</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">int</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+			exp;</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">char</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+			sign;</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">int</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+			data_length;</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">void</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">*
+			data;}</SPAN></FONT></FONT></P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=153>
+			<P STYLE="page-break-after: avoid">FOURD_TYPESTAMP</P>
+		</TD>
+		<TD WIDTH=542>
+			<P STYLE="page-break-after: avoid"><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">struct</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">{</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">short</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+			year;</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">char</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+			mounth;</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">char</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+			day;</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">unsigned</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+			</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">int</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+			milli;}</SPAN></FONT></FONT></P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=153>
+			<P STYLE="page-break-after: avoid">FOURD_DURATION</P>
+		</TD>
+		<TD WIDTH=542>
+			<P STYLE="page-break-after: avoid"><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>__int64</FONT></FONT></FONT>
+			ou <FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>long</FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2>
+			</FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>long</FONT></FONT></FONT></P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=153>
+			<P STYLE="page-break-after: avoid">FOURD_STRING</P>
+		</TD>
+		<TD WIDTH=542>
+			<P STYLE="page-break-after: avoid"><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">struct</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">{</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">int</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+			length;</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">unsigned</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+			</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">char</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+			*data;}</SPAN></FONT></FONT></P>
+		</TD>
+	</TR>
+	<TR VALIGN=TOP>
+		<TD WIDTH=153>
+			<P STYLE="page-break-after: avoid">FOURD_BLOB</P>
+		</TD>
+		<TD WIDTH=542>
+			<P STYLE="page-break-after: avoid"><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">struct</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">{</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">int</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+			length;</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">void</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+			*data;}</SPAN></FONT></FONT></P>
+		</TD>
+	</TR>
+</TABLE>
+<P LANG="en-US" STYLE="margin-bottom: 0.35cm; page-break-after: avoid">
+<BR><BR>
+</P>
+<P LANG="en-US" STYLE="margin-bottom: 0.35cm"><BR><BR>
+</P>
+<H2 CLASS="western">Déroulement d’une connexion à une base 4D</H2>
+<P STYLE="margin-bottom: 0.35cm">Le processus de connexion est
+toujours identique, en voici le déroulement.</P>
+<P STYLE="margin-bottom: 0.35cm">La connexion est stockée dans une
+structure <B>FOURD</B> qui est le plus souvent utilisée comme un
+pointeur. 
+</P>
+<H3 CLASS="western">Initialisation de la connexion</H3>
+<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2>FOURD*
+fourd_init()</FONT></FONT></P>
+<P STYLE="margin-bottom: 0.35cm">Cette fonction est obligatoire. Elle
+permet sous Windows de faire le lien avec la DLL Winsock, mais aussi
+d’allouer la mémoire pour la structure FOURD. C’est un peu comme
+un constructeur.</P>
+<H3 CLASS="western">Les connexions à une base 4D</H3>
+<P STYLE="margin-bottom: 0.35cm"><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>int</FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2>
+fourd_connect(FOURD *cnx,</FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>const</FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2>
+</FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>char</FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2>
+*host,</FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>const</FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2>
+</FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>char</FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2>
+*user,</FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>const</FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2>
+</FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>char</FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2>
+*password,</FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>const</FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2>
+</FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>char</FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2>
+*base,</FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>unsigned</FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2>
+</FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>int</FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2>
+port)</FONT></FONT></P>
+<P STYLE="margin-bottom: 0.35cm">Les paramètres de connexion à la
+base sont tout à fait classiques&nbsp;: 
+</P>
+<OL>
+	<LI><P STYLE="margin-bottom: 0.35cm">Cnx&nbsp;: le pointeur vers la
+	structure FOURD identifiant la connexion</P>
+	<LI><P STYLE="margin-bottom: 0.35cm">Host&nbsp;: le nom ou l’ip du
+	serveur (ex&nbsp;: «&nbsp;localhost&nbsp;», «&nbsp;10.2.0.194&nbsp;»)</P>
+	<LI><P STYLE="margin-bottom: 0.35cm">User&nbsp;: le
+	login/utilisateur</P>
+	<LI><P STYLE="margin-bottom: 0.35cm">Password&nbsp;: mot de passe de
+	l’utilisateur</P>
+	<LI><P STYLE="margin-bottom: 0.35cm">Port&nbsp;: port de
+	communication utiliser par le serveur 4D SQL  (par défaut&nbsp;:
+	19812)</P>
+</OL>
+<H3 CLASS="western">Fermeture de la connexion</H3>
+<P STYLE="margin-bottom: 0.35cm">Pour terminer une connexion, on
+utilise ici deux fonctions&nbsp;; la première informe le serveur de
+la fermeture du socket. La seconde permet de libérer les ressources
+allouées par fourd_init.</P>
+<P STYLE="margin-bottom: 0.35cm">Le découpage en deux fonctions
+permet de récupérer les messages d’erreur dans le cas où la
+fermeture de la communication ne se passe pas correctement.</P>
+<P STYLE="margin-bottom: 0.35cm"><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>int</FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2>
+fourd_close(FOURD *cnx)</FONT></FONT></P>
+<P STYLE="margin-bottom: 0.35cm"><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>void</FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2>
+fourd_free(FOURD* cnx)</FONT></FONT></P>
+<H3 CLASS="western">Gestion des erreurs</H3>
+<P STYLE="margin-bottom: 0.35cm">Trois fonctions permettent de
+récupérer le code d’erreur et le message d’erreur lorsqu’une
+fonction <B>fourd_</B> ne s’est pas déroulée correctement. 
+</P>
+<P STYLE="margin-bottom: 0.35cm"><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>int</FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2>
+fourd_errno(FOURD *cnx)</FONT></FONT></P>
+<P STYLE="margin-bottom: 0.35cm">La fonction fourd_errno permet de
+récupérer les codes d’erreur (au sens de 4D). Cette fonction 
+</P>
+<P STYLE="margin-bottom: 0.35cm"><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>const</FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2>
+</FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>char</FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2>
+* fourd_error(FOURD *cnx) </FONT></FONT>
+</P>
+<P STYLE="margin-bottom: 0.35cm">La fonction fourd_error permet de
+récupérer les messages d’erreur (au sens de 4D). Cette fonction
+retourne une chaine vide dans le cas ou il n’y a pas d’erreur.</P>
+<P STYLE="margin-bottom: 0.35cm"><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>const</FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2>
+</FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>char</FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2>
+* fourd_sqlstate(FOURD *cnx) </FONT></FONT>
+</P>
+<P STYLE="margin-bottom: 0.35cm">La fonction fourd_errno permet de
+récupérer les codes d’erreur normalisée en SQLSTATE. Les
+SQLSTATE sont des codes d’erreur sous forme de 5 caractères ASCII.
+Actuellement, cette fonction retourne systématique HY000. 
+</P>
+<P STYLE="margin-bottom: 0.35cm"><BR><BR>
+</P>
+<H3 CLASS="western">Exemple d'introduction</H3>
+<TABLE WIDTH=697 BORDER=0 CELLPADDING=8 CELLSPACING=0>
+	<COL WIDTH=681>
+	<TR>
+		<TD WIDTH=681 VALIGN=TOP>
+			<P STYLE="margin-bottom: 0.35cm"><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">#include</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+			</SPAN></FONT></FONT><FONT COLOR="#a31515"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">&lt;stdio.h&gt;</SPAN></FONT></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">#include</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+			</SPAN></FONT></FONT><FONT COLOR="#a31515"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">&lt;stdlib.h&gt;</SPAN></FONT></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">#include</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+			</SPAN></FONT></FONT><FONT COLOR="#a31515"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">&quot;../lib4d_sql/fourd.h&quot;</SPAN></FONT></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>int</FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2>
+			main(</FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>int</FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2>
+			argc, </FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>char</FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2>
+			**argv) </FONT></FONT>
+			</P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2>{</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2>	FOURD
+			*cnx=NULL;</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2>	</FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">cnx=fourd_init();</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">	</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">if</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">(fourd_connect(cnx,</SPAN></FONT></FONT><FONT COLOR="#a31515"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">&quot;10.2.0.82&quot;</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">,</SPAN></FONT></FONT><FONT COLOR="#a31515"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">&quot;Administrateur&quot;</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">,</SPAN></FONT></FONT><FONT COLOR="#a31515"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">&quot;&quot;</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">,</SPAN></FONT></FONT><FONT COLOR="#a31515"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">&quot;base&quot;</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">,19812))
+			{</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">		printf(</SPAN></FONT></FONT><FONT COLOR="#a31515"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">&quot;Error
+			(%d):%s\n&quot;</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">,fourd_errno(cnx),fourd_error(cnx));</SPAN></FONT></FONT></P>
+			<P LANG="en-US" STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2>		fgetc(stdin);</FONT></FONT></P>
+			<P LANG="en-US" STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2>		exit(1);</FONT></FONT></P>
+			<P LANG="en-US" STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2>	}</FONT></FONT></P>
+			<P LANG="en-US" STYLE="margin-bottom: 0.35cm">…</P>
+			<P LANG="en-US" STYLE="margin-bottom: 0.35cm"><BR><BR>
+			</P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">	</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">if</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">(fourd_close(cnx))
+			{</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">		printf(</SPAN></FONT></FONT><FONT COLOR="#a31515"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">&quot;Error
+			(%d):%s\n&quot;</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">,fourd_errno(cnx),fourd_error(cnx));</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">	</SPAN></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2>}</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2>	fourd_free(cnx);</FONT></FONT></P>
+			<P><FONT FACE="Courier New, serif"><FONT SIZE=2>}</FONT></FONT></P>
+		</TD>
+	</TR>
+</TABLE>
+<P STYLE="margin-bottom: 0.35cm"><BR><BR>
+</P>
+<P STYLE="margin-bottom: 0.35cm"><BR><BR>
+</P>
+<H2 CLASS="western">Requête sans résultat</H2>
+<P STYLE="margin-bottom: 0.35cm">Pour exécuter une requête sans
+résultat, tel que INSERT, DELETE, UPDATE, on utilise la fonction
+fourd_exec. 
+</P>
+<P STYLE="margin-bottom: 0.35cm"><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>int</FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2>
+fourd_exec(FOURD *cnx,</FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>const</FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2>
+</FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>char</FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2>
+*query)</FONT></FONT></P>
+<P STYLE="margin-bottom: 0.35cm">Récupérer le nombre de ligne
+affecté par la requête&nbsp;:</P>
+<P LANG="en-US" STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2>FOURD_LONG8
+fourd_affected_rows(FOURD *cnx)</FONT></FONT></P>
+<H2 CLASS="western">Requête avec résultat</H2>
+<P STYLE="margin-bottom: 0.35cm">Pour exécuter une requête avec
+résultat, tel que SELECT, on peut utiliser soit&nbsp;:</P>
+<OL>
+	<LI><P STYLE="margin-bottom: 0.35cm">fourd_query</P>
+	<LI><P STYLE="margin-bottom: 0.35cm">fourd_prepare_statement et
+	fourd_exec_statement. 
+	</P>
+</OL>
+<P STYLE="margin-bottom: 0.35cm">Le doit de l’une ou l’autre
+méthode, se fait en fonction de l’utilisation ou non de paramètre
+de requête. 
+</P>
+<P STYLE="margin-bottom: 0.35cm">La fonction fourd_query ne peut
+prendre aucun paramètre alors que le couple fourd_prepare_statement
+et fourd_exec_statement est fait pour cela. 
+</P>
+<H3 CLASS="western">Requête immédiate avec résultat</H3>
+<P STYLE="margin-bottom: 0.35cm">On utilise la fonction fourd_query
+pour exécuter une requête qui ne prend aucun paramètre. 
+</P>
+<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2>FOURD_RESULT
+*fourd_query(FOURD *cnx,</FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>const</FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2>
+</FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>char</FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2>
+*query)</FONT></FONT></P>
+<P STYLE="margin-bottom: 0.35cm">La description des fonctions à
+utiliser pour lire un FOURD_RESULT sont décrites plus loin. 
+</P>
+<H3 CLASS="western">Requête préparée</H3>
+<P STYLE="margin-bottom: 0.35cm">Les requêtes préparées
+s’utilisent selon le scénario suivant&nbsp;:</P>
+<OL>
+	<LI><P STYLE="margin-bottom: 0.35cm">Créer une commande préparée
+	(fourd_parepare_statement)</P>
+	<LI><P STYLE="margin-bottom: 0.35cm">Lier les paramètres</P>
+	<LI><P STYLE="margin-bottom: 0.35cm">Exécuter la commande</P>
+</OL>
+<P STYLE="margin-bottom: 0.35cm">Il est possible de recommencer les
+étapes 2 et 3 ou seulement 3 plusieurs fois de suite sans
+re-préparer le statement, dans le cas ou la requête ne change pas
+entre deux exécutions. Par exemple&nbsp;:</P>
+<OL>
+	<LI><P LANG="en-US" STYLE="margin-bottom: 0.35cm">Prépare le
+	statement «&nbsp;select * from ma_table where id=&nbsp;? and
+	annee=&nbsp;?&nbsp;»</P>
+	<LI><P STYLE="margin-bottom: 0.35cm">Lier le paramètre 1 à «&nbsp;2&nbsp;»</P>
+	<LI><P STYLE="margin-bottom: 0.35cm">Lier le paramètre 2 à 2005</P>
+	<LI><P STYLE="margin-bottom: 0.35cm">Exécuter la commande</P>
+	<LI><P STYLE="margin-bottom: 0.35cm">Récupérer les résultats</P>
+	<LI><P STYLE="margin-bottom: 0.35cm">Lier le paramètre 1 à «&nbsp;3&nbsp;»</P>
+	<LI><P STYLE="margin-bottom: 0.35cm">Exécuter la commande</P>
+	<LI><P STYLE="margin-bottom: 0.35cm">Lier le paramètre 2 à
+	«&nbsp;2009&nbsp;»</P>
+	<LI><P STYLE="margin-bottom: 0.35cm">Exécuter la commande</P>
+	<LI><P STYLE="margin-bottom: 0.35cm">Récupérer les résultats</P>
+	<LI><P STYLE="margin-bottom: 0.35cm">Exécuter la commande</P>
+</OL>
+<P STYLE="margin-bottom: 0.35cm"><BR><BR>
+</P>
+<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2>FOURD_STATEMENT
+* fourd_prepare_statement(FOURD *cnx,</FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>const</FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2>
+</FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>char</FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2>
+*query)</FONT></FONT></P>
+<P STYLE="margin-bottom: 0.35cm">Les paramètres sont les suivants&nbsp;:</P>
+<OL>
+	<LI><P STYLE="margin-bottom: 0.35cm">Cnx&nbsp;: le pointeur vers la
+	structure FOURD identifiant la connexion</P>
+	<LI><P STYLE="margin-bottom: 0.35cm">Query&nbsp;: requête
+	avec&nbsp;«&nbsp;?&nbsp;» pour les paramètres. Norme 4D-SQL 
+	</P>
+</OL>
+<P STYLE="margin-bottom: 0.35cm"><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">int</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+fourd_bind_param(FOURD_STATEMENT *state,</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">unsigned</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">int</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+numParam,FOURD_TYPE type, </SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">void</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+*val)</SPAN></FONT></FONT></P>
+<P STYLE="margin-bottom: 0.35cm">Les paramètres sont les suivants&nbsp;:</P>
+<OL>
+	<LI><P STYLE="margin-bottom: 0.35cm">State&nbsp;: le pointeur sur la
+	structure retourné par fourd_prepare_statement</P>
+	<LI><P STYLE="margin-bottom: 0.35cm">NumParam&nbsp;: le numéro du
+	paramètre (zero-based)</P>
+	<LI><P STYLE="margin-bottom: 0.35cm">Val&nbsp;: le pointeur sur la
+	valeur (de type FOURD_)</P>
+</OL>
+<P STYLE="margin-bottom: 0.35cm">La valeur passée à bind est copiée
+dans la commande, elle est donc évaluée au lancement de la lisions
+et non au moment de l’exécution. 
+</P>
+<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2>FOURD_RESULT
+*fourd_exec_statement(FOURD_STATEMENT *state)</FONT></FONT></P>
+<P STYLE="margin-bottom: 0.35cm">Les paramètres sont les suivants&nbsp;:</P>
+<OL>
+	<LI><P STYLE="margin-bottom: 0.35cm">State&nbsp;: pointeur sur la
+	structure retournée par fourd_prepare_statement</P>
+</OL>
+<P STYLE="margin-bottom: 0.35cm"><BR><BR>
+</P>
+<H2 CLASS="western">Utilisation des résultats</H2>
+<P STYLE="margin-bottom: 0.35cm">Une structure FOURD_RESULT contient
+le résultat de la requête ainsi que quelque information de
+métadonnées telle que le nom et le type des colonnes, le nombre de
+ligne et de colonnes du résultat. 
+</P>
+<P STYLE="margin-bottom: 0.35cm">Il faut noter qu’actuellement, les
+multi-requêtes sont interdites par la bibliothèque lib4D_SQL, pour
+des raisons de sécurité. Une erreur est émise si plusieurs
+requêtes sont envoyées. 
+</P>
+<H3 CLASS="western">Parcourir les lignes du résultat</H3>
+<P STYLE="margin-bottom: 0.35cm">La fonction <FONT FACE="Courier New, serif"><FONT SIZE=2>fourd_next_row</FONT></FONT>
+permet de passer à la ligne suivante. Il n’est pas prévu de
+permettre le passage à la ligne précédente ou a une ligne
+quelconque du résultat. Cela peut être utile ou optionnel selon les
+client/pilote tel que PDO ou JDBC. 
+</P>
+<P STYLE="margin-bottom: 0.35cm"><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">int</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+fourd_next_row(FOURD_RESULT *res)</SPAN></FONT></FONT></P>
+<P STYLE="margin-bottom: 0.35cm">Cette fonction retourne 1 s’il
+existe bien une nouvelle ligne 0 sinon. 
+</P>
+<H3 CLASS="western">Récupérer la valeur d’une colonne en string</H3>
+<P STYLE="margin-bottom: 0.35cm">La fonction <FONT FACE="Courier New, serif"><FONT SIZE=2>fourd_field_string</FONT></FONT>
+permet de récupère la valeur d’une colonne sous forme d’une
+chaine de caractère. 
+</P>
+<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">FOURD_STRING
+* fourd_field_string(FOURD_RESULT *res,</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">unsigned</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">int</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+numCol)</SPAN></FONT></FONT></P>
+<P STYLE="margin-bottom: 0.35cm"><FONT COLOR="#ff0000">Attention
+cette fonction n’est pas utilisable pour les types FOURD_FLOAT et
+les BLOB</FONT></P>
+<H3 CLASS="western">Récupérer la valeur d’une colonne par
+référence</H3>
+<P STYLE="margin-bottom: 0.35cm">La fonction <FONT FACE="Courier New, serif"><FONT SIZE=2>fourd_field</FONT></FONT>
+permet de récupérer un pointeur sur la valeur de la colonne. Si la
+valeur doit être utilisée plus tard, il est important de copier la
+valeur, car elle peut être modifiée ou supprimée par la
+bibliothèque. Afin de traiter correctement le pointeur de retour, il
+faut utiliser la fonction <FONT FACE="Courier New, serif"><FONT SIZE=2>fourd_get_column_type</FONT></FONT>
+afin de connaître le type de donné du pointeur. 
+</P>
+<P STYLE="margin-bottom: 0.35cm"><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">void</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+* fourd_field(FOURD_RESULT *res,</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">unsigned</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">int</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+numCol)</SPAN></FONT></FONT></P>
+<H3 CLASS="western">Nombre de ligne</H3>
+<P STYLE="margin-bottom: 0.35cm">La fonction <FONT FACE="Courier New, serif"><FONT SIZE=2>fourd_num_rows
+</FONT></FONT>retourne le nombre de lignes du résultat. Elles ne
+sont pas forcement tout stocké en mémoire. Il faut utiliser la
+fonction de fetch pour passer d’une ligne à l’autre. 
+</P>
+<P LANG="en-US" STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2>FOURD_LONG8
+fourd_num_rows(FOURD_RESULT *result)</FONT></FONT></P>
+<H3 CLASS="western">Nombre de colonnes</H3>
+<P STYLE="margin-bottom: 0.35cm">La fonction <FONT FACE="Courier New, serif"><FONT SIZE=2>fourd_num_columns
+</FONT></FONT>retourne le nombre de colonnes dans le résultat. 
+</P>
+<P STYLE="margin-bottom: 0.35cm"><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">int</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+fourd_num_columns(FOURD_RESULT *res)</SPAN></FONT></FONT></P>
+<H3 CLASS="western">Type d’une colonne</H3>
+<P STYLE="margin-bottom: 0.35cm">La fonction <FONT FACE="Courier New, serif"><FONT SIZE=2>fourd_get_column_type</FONT></FONT>
+retourne le type de la colonne (identifié par son index en 0-base).</P>
+<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">FOURD_TYPE
+fourd_get_column_type(FOURD_RESULT *res,</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">unsigned</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">int</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+numCol)</SPAN></FONT></FONT></P>
+<P STYLE="margin-bottom: 0.35cm">Le type peut être transformé en
+string en utilisant <FONT FACE="Courier New, serif"><FONT SIZE=2>stringFromType</FONT></FONT>.</P>
+<P STYLE="margin-bottom: 0.35cm"><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">const</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">char</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">*
+stringFromType(FOURD_TYPE type)</SPAN></FONT></FONT></P>
+<H3 CLASS="western">Nom d’une colonne</H3>
+<P STYLE="margin-bottom: 0.35cm">La fonction <FONT FACE="Courier New, serif"><FONT SIZE=2>fourd_get_column_name
+</FONT></FONT>retourne le nom de la colonne (identifié par son index
+en 0-base).</P>
+<P STYLE="margin-bottom: 0.35cm"><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">const</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">char</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+* fourd_get_column_name(FOURD_RESULT *res,</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">unsigned</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">int</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+numCol)</SPAN></FONT></FONT></P>
+<P STYLE="margin-bottom: 0.35cm">Le nom retourné ne contient pas les
+crochets habituellement envoyés par le serveur 4D SQL.&nbsp;</P>
+<P STYLE="margin-bottom: 0.35cm">Voici un exemple de requête et de
+lecture du résultat&nbsp;:</P>
+<TABLE WIDTH=759 BORDER=0 CELLPADDING=8 CELLSPACING=0>
+	<COL WIDTH=743>
+	<TR>
+		<TD WIDTH=743 VALIGN=TOP>
+			<P STYLE="margin-bottom: 0.35cm"><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">if</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">((state=fourd_prepare_statement(cnx,</SPAN></FONT></FONT><FONT COLOR="#a31515"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">&quot;select
+			id,cDate from ChampDate&quot;</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">))==NULL)
+			{</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">	printf(</SPAN></FONT></FONT><FONT COLOR="#a31515"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">&quot;Error
+			sur prepare (%d):%s\n&quot;</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">,fourd_errno(cnx),fourd_error(cnx));</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">}</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">else</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+			</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">if</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">((res=fourd_exec_statement(state))==NULL)	{</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">	printf(</SPAN></FONT></FONT><FONT COLOR="#a31515"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">&quot;Error
+			sur exec (%d):%s\n&quot;</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">,fourd_errno(cnx),fourd_error(cnx));</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">}</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">else</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+			{</SPAN></FONT></FONT></P>
+			<P LANG="en-US" STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2>	FOURD_TYPE
+			type=VK_UNKNOW;</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">	printf(</SPAN></FONT></FONT><FONT COLOR="#a31515"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">&quot;fourd_num_columns:%d\n&quot;</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">,nbCol);</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">	printf(</SPAN></FONT></FONT><FONT COLOR="#a31515"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">&quot;Nb
+			row in result:%d\n&quot;</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">,fourd_num_rows(res));</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">	</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">for</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">(r=0;r&lt;nbCol;r++)
+			{</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">		printf(</SPAN></FONT></FONT><FONT COLOR="#a31515"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">&quot;|
+			%s (%s)\t&quot;</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">,</SPAN></FONT></FONT></P>
+			<P LANG="en-US" STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2>			fourd_get_column_name(res,r),</FONT></FONT></P>
+			<P LANG="en-US" STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2>			stringFromType(fourd_get_column_type(res,r)));</FONT></FONT></P>
+			<P LANG="en-US" STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2>	}</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">	</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">while</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">(fourd_next_row(res))
+			{</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">		</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">for</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">(c=0;c&lt;nbCol;c++){</SPAN></FONT></FONT></P>
+			<P LANG="en-US" STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2>			type=fourd_get_column_type(res,c);</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">			</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">switch</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">(type){</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">			</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">case</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+			VK_STRING:</SPAN></FONT></FONT></P>
+			<P LANG="en-US" STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2>				fourd_field_to_string(res,c,&amp;value,&amp;len);</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">				</SPAN></FONT></FONT><FONT COLOR="#008000"><FONT FACE="Courier New, serif"><FONT SIZE=2>/*
+			Traitement de la chaine, attention c’est en UTF-16 */</FONT></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2>				</FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">{</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">					</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">int</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+			loc_i=0;</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">					</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">for</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">(loc_i=0;loc_i&lt;len;loc_i+=2)
+			{</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">						printf(</SPAN></FONT></FONT><FONT COLOR="#a31515"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">&quot;%c%&quot;</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">,value[loc_i]);</SPAN></FONT></FONT></P>
+			<P LANG="en-US" STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2>					}</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">					printf(</SPAN></FONT></FONT><FONT COLOR="#a31515"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">&quot;\t\t|
+			&quot;</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">);</SPAN></FONT></FONT></P>
+			<P LANG="en-US" STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2>				}</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">			</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">case</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+			VK_BLOB:</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">			</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">case</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">
+			VK_IMAGE:</SPAN></FONT></FONT></P>
+			<P LANG="en-US" STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2>				{</FONT></FONT></P>
+			<P LANG="en-US" STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2>					FOURD_BLOB
+			*b=fourd_field(res,c);</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">					</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">if</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">(b!=NULL)
+			{</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">						printf(</SPAN></FONT></FONT><FONT COLOR="#a31515"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">&quot;Blob
+			(%d bytes)\t| &quot;</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">,b-&gt;length);</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">					</SPAN></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2>}</FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>else</FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2>
+			{</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2>						printf(</FONT></FONT><FONT COLOR="#a31515"><FONT FACE="Courier New, serif"><FONT SIZE=2>&quot;Null\t\t\t|
+			&quot;</FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2>);</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2>					</FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">}</SPAN></FONT></FONT></P>
+			<P LANG="en-US" STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2>				}</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">				</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">break</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">;</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">			</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">default</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">:</SPAN></FONT></FONT></P>
+			<P LANG="en-US" STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2>				fourd_field_to_string(res,c,&amp;value,&amp;len);</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">				printf(</SPAN></FONT></FONT><FONT COLOR="#a31515"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">&quot;%s\t\t|
+			&quot;</SPAN></FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">,value);</SPAN></FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2><SPAN LANG="en-US">				</SPAN></FONT></FONT><FONT COLOR="#0000ff"><FONT FACE="Courier New, serif"><FONT SIZE=2>break</FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2>;</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2>			}</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2>			printf(</FONT></FONT><FONT COLOR="#a31515"><FONT FACE="Courier New, serif"><FONT SIZE=2>&quot;\n&quot;</FONT></FONT></FONT><FONT FACE="Courier New, serif"><FONT SIZE=2>);</FONT></FONT></P>
+			<P STYLE="margin-bottom: 0.35cm"><FONT FACE="Courier New, serif"><FONT SIZE=2>		}</FONT></FONT></P>
+			<P><BR>
+			</P>
+		</TD>
+	</TR>
+</TABLE>
+<P STYLE="margin-bottom: 0.35cm"><BR><BR>
+</P>
+<P STYLE="margin-bottom: 0.35cm"><BR><BR>
+</P>
+</BODY>
+</HTML>

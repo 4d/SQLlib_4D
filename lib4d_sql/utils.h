@@ -1,0 +1,1 @@
+char *strstrip(char *s);
