@@ -1,5 +1,4 @@
-SQLlib_4D
-=========
+#SQLlib_4D#
 
 This library is an interface with the 4D SQL server.
 It is intented to work with 4D version 11 and up.
@@ -21,6 +20,6 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 
-Compilation : 
-===========
+##Compilation##
+
 make
