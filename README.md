@@ -6,14 +6,21 @@ It is highly recommanded to use version 11.4 and more recent.
 
 It is used by the [PDO_4D PHP driver](http://php.net/manual/en/ref.pdo-4d.php) (see [source](http://pecl.php.net/package/PDO_4D))
 
+
 ##Documentation##
 
 The documentation is available in [HTML](https://github.com/AMorgaut/SQLlib_4D/blob/master/lib4d_sql/lib4D_SQL.html) and in [ODT](https://github.com/AMorgaut/SQLlib_4D/blob/master/lib4d_sql/lib4D_SQL.odt) formats
 
 
+##Tests##
+
+Unit tests are availables in the testLib4d folder
+
+
 ##Compilation##
 
 make
+
 
 ##License##
 
