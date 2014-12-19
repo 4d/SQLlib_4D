@@ -1,3 +1,32 @@
+/*
+  +----------------------------------------------------------------------+
+  | lib4D_SQL                                                            |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2009 The PHP Group                                     |
+  +----------------------------------------------------------------------+
+  |                                                                      |
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | http://www.php.net/license/3_01.txt                                  |
+  |                                                                      |
+  | Its original copy is usable under several licenses and is available  |
+  | through the world-wide-web at the following url:                     |
+  | http://freshmeat.net/projects/lib4d_sql                              |
+  |                                                                      |
+  | Unless required by applicable law or agreed to in writing, software  |
+  | distributed under the License is distributed on an "AS IS" BASIS,    |
+  | WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or      |
+  | implied. See the License for the specific language governing         |
+  | permissions and limitations under the License.                       |
+  +----------------------------------------------------------------------+
+  | Contributed by: 4D <php@4d.fr>, http://www.4d.com                    |
+  |                 Alter Way, http://www.alterway.fr                    |
+  | Authors: Stephane Planquart <stephane.planquart@o4db.com>            |
+  |          Alexandre Morgaut <php@4d.fr>                               |
+  +----------------------------------------------------------------------+
+*/
+
 #include <stdio.h>
 #include <string.h>
 
@@ -108,8 +137,12 @@ int vk_sizeof(FOURD_TYPE type)
 		//Varying length
 		return -1;
 		break;
+	default:
+			Printf("Error: Unknow type in vk_sizeof function\n");
+			return 0;
+			break;
 	}
-	//error type not found
+	//error type not found. Should now be handled by the default switch case
 	Printf("Error: Unknow type in vk_sizeof function\n");
 	return 0;
 }
@@ -132,6 +165,9 @@ const char* stringFromResultType(FOURD_RESULT_TYPE type)
 	case RESULT_SET:
 		return "Result-Set";
 		break;
+	default:
+			return "Unknown";
+			break;
 	}
-	return "Unknow";
+	return "Unknown";
 }
