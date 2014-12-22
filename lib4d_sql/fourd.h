@@ -261,7 +261,11 @@ int fourd_errno(FOURD *cnx);
 const char * fourd_error(FOURD *cnx);
 const char * fourd_sqlstate(FOURD *cnx);
 void fourd_free(FOURD* cnx);
+void fourd_free_statement(FOURD_STATEMENT *state);
 void fourd_timeout(FOURD* cnx,int timeout);
+//For use by external non-c code that can't access/clear this block of memory
+//directly.
+void _free_field_string(char **value);
 
 /*function on FOURD_RESULT*/
 FOURD_LONG8 fourd_num_rows(FOURD_RESULT *result);
@@ -279,7 +283,6 @@ const char * fourd_get_column_name(FOURD_RESULT *res,unsigned int numCol);
 FOURD_TYPE fourd_get_column_type(FOURD_RESULT *res,unsigned int numCol);
 int fourd_num_columns(FOURD_RESULT *res);
 int fourd_field_to_string(FOURD_RESULT *res,unsigned int numCol,char **value,size_t *len);
-
 
 FOURD_STATEMENT * fourd_prepare_statement(FOURD *cnx,const char *query);
 int fourd_bind_param(FOURD_STATEMENT *state,unsigned int numParam,FOURD_TYPE type, void *val);
