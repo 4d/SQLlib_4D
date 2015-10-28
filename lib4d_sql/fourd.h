@@ -1,3 +1,31 @@
+/*
+  +----------------------------------------------------------------------+
+  | lib4D_SQL                                                            |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 2009 The PHP Group                                     |
+  +----------------------------------------------------------------------+
+  |                                                                      |
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | http://www.php.net/license/3_01.txt                                  |
+  |                                                                      |
+  | Its original copy is usable under several licenses and is available  |
+  | through the world-wide-web at the following url:                     |
+  | http://freshmeat.net/projects/lib4d_sql                              |
+  |                                                                      |
+  | Unless required by applicable law or agreed to in writing, software  |
+  | distributed under the License is distributed on an "AS IS" BASIS,    |
+  | WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or      |
+  | implied. See the License for the specific language governing         |
+  | permissions and limitations under the License.                       |
+  +----------------------------------------------------------------------+
+  | Contributed by: 4D <php@4d.fr>, http://www.4d.com                    |
+  |                 Alter Way, http://www.alterway.fr                    |
+  | Authors: Stephane Planquart <stephane.planquart@o4db.com>            |
+  |          Alexandre Morgaut <php@4d.fr>                               |
+  +----------------------------------------------------------------------+
+*/
 #ifndef __FOURD__
 #define __FOURD__ 1
 
@@ -10,6 +38,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <netinet/tcp.h>
 #include <arpa/inet.h>
 #include <unistd.h> /* close */
 #include <errno.h>
@@ -28,9 +57,9 @@ typedef struct in_addr IN_ADDR;
 #define VERBOSE 0
 
 
-//taille maximal de 2K pour les envoi de requête 
-//#define BUFFER_LENGTH 131072
-//taille maximal de 128K pour les réponse
+/* taille maximal de 2K pour les envoi de requÍte  */
+/* #define BUFFER_LENGTH 131072 */
+/* taille maximal de 128K pour les rÈponse */
 #define BUFFER_LENGTH 131072
 #define ERROR_STRING_LENGTH 2048
 
@@ -100,7 +129,7 @@ typedef	struct{short year;char mounth;char day;unsigned int milli;}FOURD_TIMESTA
 typedef	__int64 FOURD_DURATION;//in milliseconds
 typedef	struct{int length;unsigned char *data;}FOURD_STRING;
 typedef	struct{int length;void *data;}FOURD_BLOB;
-//typedef	struct{}FOURD_IMAGE; 
+/* typedef	struct{}FOURD_IMAGE;  */
 #else
 typedef short FOURD_BOOLEAN;
 typedef short FOURD_BYTE;
@@ -108,18 +137,18 @@ typedef short FOURD_WORD;
 typedef int FOURD_LONG;
 typedef long long FOURD_LONG8;
 typedef double FOURD_REAL;
-typedef struct{int exp;char sign;int data_length;void* data;}FOURD_FLOAT;
-typedef struct{short year;char mounth;char day;unsigned int milli;}FOURD_TIMESTAMP;
+typedef struct{int exp;unsigned char sign;int data_length;void* data;}FOURD_FLOAT;
+typedef struct{short year;unsigned char mounth;unsigned char day;unsigned int milli;}FOURD_TIMESTAMP;
 typedef long long FOURD_DURATION;//in milliseconds
 typedef struct{int length;unsigned char *data;}FOURD_STRING;
 typedef struct{int length;void *data;}FOURD_BLOB;
-//typedef       struct{}FOURD_IMAGE;
+/* typedef       struct{}FOURD_IMAGE; */
 
 #endif
 
 
 typedef struct{
-	//Socket Win32
+	/* Socket Win32 */
 #ifdef WIN32
 	WSADATA wsaData;
 	SOCKET socket;
@@ -134,13 +163,17 @@ typedef struct{
 	/*char reponse[BUFFER_LENGTH];
 	int reponse_len;*/
 
-	//status
+	/* status */
 	int status;//1 pour OK, 0 pour KO
 	FOURD_LONG8 error_code;
 	char error_string[ERROR_STRING_LENGTH];
 
-	//updated row
+	/* updated row */
 	FOURD_LONG8 updated_row;
+	
+	/* PREFERRED-IMAGE-TYPES */
+	char *preferred_image_types;
+	int timeout;
 
 } FOURD;
 
@@ -209,10 +242,12 @@ typedef struct{
 
 typedef struct {
 	FOURD *cnx;
-	char query[MAX_HEADER_SIZE];	/*MAX_HEADER_SIZE is user because the query is insert into header*/
+	char *query;	/*MAX_HEADER_SIZE is using because the query is insert into header*/
 	unsigned int nb_element;
 	unsigned int nbAllocElement;
 	FOURD_ELEMENT *elmt;
+	/* PREFERRED-IMAGE-TYPES */
+	char *preferred_image_types;
 }FOURD_STATEMENT;
 
 
@@ -226,7 +261,8 @@ int fourd_errno(FOURD *cnx);
 const char * fourd_error(FOURD *cnx);
 const char * fourd_sqlstate(FOURD *cnx);
 void fourd_free(FOURD* cnx);
-
+void fourd_free_statement(FOURD_STATEMENT *state);
+void fourd_timeout(FOURD* cnx,int timeout);
 
 /*function on FOURD_RESULT*/
 FOURD_LONG8 fourd_num_rows(FOURD_RESULT *result);
@@ -243,10 +279,14 @@ int fourd_next_row(FOURD_RESULT *res);
 const char * fourd_get_column_name(FOURD_RESULT *res,unsigned int numCol);
 FOURD_TYPE fourd_get_column_type(FOURD_RESULT *res,unsigned int numCol);
 int fourd_num_columns(FOURD_RESULT *res);
-int fourd_field_to_string(FOURD_RESULT *res,unsigned int numCol,char **value,int *len);	
-
+int fourd_field_to_string(FOURD_RESULT *res,unsigned int numCol,char **value,size_t *len);
 
 FOURD_STATEMENT * fourd_prepare_statement(FOURD *cnx,const char *query);
 int fourd_bind_param(FOURD_STATEMENT *state,unsigned int numParam,FOURD_TYPE type, void *val);
-FOURD_RESULT *fourd_exec_statement(FOURD_STATEMENT *state);
+FOURD_RESULT *fourd_exec_statement(FOURD_STATEMENT *state, int res_size);
+
+void fourd_set_preferred_image_types(FOURD* cnx,const char *types);
+void fourd_set_statement_preferred_image_types(FOURD_STATEMENT *state,const char *types);
+const char* fourd_get_preferred_image_types(FOURD* cnx);
+const char* fourd_get_statement_preferred_image_types(FOURD_STATEMENT *state);
 #endif
